@@ -39,22 +39,26 @@ print_string:
 	ret
 
 print_hex:
-	lea di, [STR_HEX + 5]
-	xor dx, dx
+	; Assuming the number we want to print is in SI
+	; We're going to loop 4 times and process 4 bits each iteration.
+	; By right shifting and ANDing we get the 4 bit integer, which
+	;   we can do simple arithmetics on to get the proper ASCII value.
+	xor dx, dx ; Loop counter
 	.loop:
 	mov ax, si
 	mov cx, dx
-	shl cx, 2
-	shr ax, cl
+	shl cx, 2 ; Multiply by 4 (we want to shift multiples of 4 bits)
+	shr ax, cl ; Shift the number so the 4 bits are least significant
 	and ax, 0xf
 	cmp al, 9
 	jle .loopend
-	add al, 7
+	add al, 7 ; There's an offset between numbers and chars in ASCII
 	.loopend:
-	add al, 48
+	add al, 48 ; ASCII 0 is at 48
 	mov bx, 3
-	sub bx, dx
-	mov [STR_HEX + bx + 2], al
+	sub bx, dx ; Calculate the offset into the string
+	           ; (0th number (from right) is 3 into string)
+	mov [STR_HEX + bx + 2], al ; Put the ASCII char into the string
 	inc dx
 	cmp dx, 3
 	jle .loop
