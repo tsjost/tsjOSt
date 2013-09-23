@@ -2,25 +2,71 @@ ORG 0x7c00
 BITS 16
 CPU 386
 
+; Clear screen
 mov ax, 2
 int 0x10
 
 mov si, STR_HELLO
 call print_string
 
-mov si, 0x1337
+mov si, STR_LOADING_FROM_DISK
+call print_string
+
+mov [BOOT_DRIVE], dl
+
+mov bp, 0x8000
+mov sp, bp
+
+mov bx, 0x9000
+mov dh, 2
+mov dl, [BOOT_DRIVE]
+call disk_load
+
+mov si, 1
+call print_hex
+mov si, [0x9000]
 call print_hex
 
-mov si, 0xCAFE
+mov si, 2
 call print_hex
-
-mov si, 0xBABE
+mov si, [0x9000 + 512]
 call print_hex
 
 mov si, STR_BOOTING
 call print_string
 
 jmp $
+
+disk_load:
+	push dx
+
+	mov ah, 0x02
+	mov al, dh
+	mov ch, 0x00
+	mov cl, 0x02
+	mov dh, 0x00
+	int 0x13
+
+	jc .error
+
+	pop dx
+	cmp dh, al
+	jne .error_sectors_not_same
+	ret
+
+	.error:
+	mov si, STR_DISK_ERROR
+	call print_string
+	mov dx, ax
+	xor dl, dl
+	mov si, dx
+	call print_hex
+	jmp $
+
+	.error_sectors_not_same:
+	mov si, STR_DISK_ERROR_SECTORS_NOT_SAME
+	call print_string
+	jmp $
 
 print_string:
 	push ax
@@ -70,13 +116,24 @@ print_hex:
 	ret
 
 ; Data
+BOOT_DRIVE: db 0
+
 STR_HELLO:
-	db 'Hello World!', 10, 13, 0
+	db 'Hello World!', 10,13,0
+STR_LOADING_FROM_DISK:
+	db "Loading data from disk...", 13,10,0
 STR_BOOTING:
-	db 'Booting Operating System...', 10, 13, 0
+	db 'Booting Operating System...', 10,13,0
 STR_HEX:
-	db '0x0000', 13,10, 0
+	db '0x0000', 13,10,0
+STR_DISK_ERROR:
+	db "Could not read from disk!", 13,10,0
+STR_DISK_ERROR_SECTORS_NOT_SAME:
+	db "Could not read the specified amount of sectors from disk!", 13,10,0
 
 times 510-($-$$) db 0
 dw 0xaa55
+
+times 256 dw 0xCAFE
+times 256 dw 0xBABE
 
