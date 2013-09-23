@@ -25,16 +25,16 @@ jmp $
 print_string:
 	push ax
 
-	print_string_loop:
+	.loop:
 	cmp [si], byte 0
-	je print_string_end
+	je .end
 	mov ah, 0x0e
 	mov al, [si]
 	int 0x10
 	inc si
-	jmp print_string_loop
+	jmp .loop
 
-	print_string_end:
+	.end:
 	pop ax
 	ret
 
