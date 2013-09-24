@@ -16,7 +16,7 @@ entry.o: entry.asm
 	nasm $^ -f elf -o $@
 
 kernel.o: kernel.c
-	gcc -m32 -ffreestanding -c $^ -o $@
+	gcc -m32 -ffreestanding -Wall -Wextra -pedantic -std=c11 -c $^ -o $@
 
 clean:
 	rm *.bin *.o
