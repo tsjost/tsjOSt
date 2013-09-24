@@ -15,14 +15,13 @@ call print_string
 
 call load_kernel
 
+; Go into protected mode
 cli
 lgdt [gdt_descriptor]
 mov eax, cr0
 or eax, 0x1
 mov cr0, eax
 jmp CODE_SEG:init_protected_mode
-
-jmp $
 
 load_kernel:
 	mov si, STR_BOOTING
@@ -188,8 +187,6 @@ STR_HELLO:
 	db 'Hello World!', 10,13,0
 STR_HELLO_PROTECTED:
 	db "Hello World from Protected Mode!", 0
-STR_LOADING_FROM_DISK:
-	db "Loading data from disk...", 13,10,0
 STR_BOOTING:
 	db 'Booting Operating System...', 10,13,0
 STR_HEX:
