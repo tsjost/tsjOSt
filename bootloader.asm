@@ -166,13 +166,35 @@ init_protected_mode:
 	jmp start_protected_mode
 
 start_protected_mode:
+	mov si, STR_HELLO_PROTECTED
+	call print_string_protected
 	jmp $
+
+print_string_protected:
+	pusha
+
+	mov edx, 0xb8000
+	.loop:
+	cmp [si], byte 0
+	je .end
+	mov ah, 0x0f
+	mov al, [si]
+	mov [edx], ax
+	inc si
+	add edx, 2
+	jmp .loop
+
+	.end:
+	popa
+	ret
 
 ; Data
 BOOT_DRIVE: db 0
 
 STR_HELLO:
 	db 'Hello World!', 10,13,0
+STR_HELLO_PROTECTED:
+	db "Hello World from Protected Mode!", 0
 STR_LOADING_FROM_DISK:
 	db "Loading data from disk...", 13,10,0
 STR_BOOTING:
