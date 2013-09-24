@@ -2,6 +2,10 @@ ORG 0x7c00
 BITS 16
 CPU 386
 
+KERNEL_OFFSET equ 0x1000
+
+mov [BOOT_DRIVE], dl
+
 ; Clear screen
 mov ax, 2
 int 0x10
@@ -9,31 +13,7 @@ int 0x10
 mov si, STR_HELLO
 call print_string
 
-mov si, STR_LOADING_FROM_DISK
-call print_string
-
-mov [BOOT_DRIVE], dl
-
-mov bp, 0x8000
-mov sp, bp
-
-mov bx, 0x9000
-mov dh, 2
-mov dl, [BOOT_DRIVE]
-call disk_load
-
-mov si, 1
-call print_hex
-mov si, [0x9000]
-call print_hex
-
-mov si, 2
-call print_hex
-mov si, [0x9000 + 512]
-call print_hex
-
-mov si, STR_BOOTING
-call print_string
+call load_kernel
 
 cli
 lgdt [gdt_descriptor]
@@ -43,6 +23,17 @@ mov cr0, eax
 jmp CODE_SEG:init_protected_mode
 
 jmp $
+
+load_kernel:
+	mov si, STR_BOOTING
+	call print_string
+
+	mov bx, KERNEL_OFFSET
+	mov dh, 1
+	mov dl, [BOOT_DRIVE]
+	call disk_load
+
+	ret
 
 disk_load:
 	push dx
@@ -65,7 +56,6 @@ disk_load:
 	mov si, STR_DISK_ERROR
 	call print_string
 	mov dx, ax
-	xor dl, dl
 	mov si, dx
 	call print_hex
 	jmp $
@@ -168,6 +158,9 @@ init_protected_mode:
 start_protected_mode:
 	mov si, STR_HELLO_PROTECTED
 	call print_string_protected
+
+	call KERNEL_OFFSET
+
 	jmp $
 
 print_string_protected:
@@ -208,7 +201,4 @@ STR_DISK_ERROR_SECTORS_NOT_SAME:
 
 times 510-($-$$) db 0
 dw 0xaa55
-
-times 256 dw 0xCAFE
-times 256 dw 0xBABE
 
