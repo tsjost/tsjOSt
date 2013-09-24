@@ -1,12 +1,22 @@
-all:
-	nasm bootloader.asm -f bin -o bootloader.bin
-	nasm entry.asm -f elf -o entry.o
-	gcc -m32 -ffreestanding -c kernel.c -o kernel.o
-	ld -Ttext 0x1000 --oformat binary -m elf_i386 -o kernel.bin entry.o kernel.o
-	cat bootloader.bin kernel.bin > bootsector.bin.tmp
-	dd if=/dev/zero of=bootsector.bin bs=512 count=2
-	dd if=bootsector.bin.tmp of=bootsector.bin conv=notrunc
+all: disk.iso
+
+disk.iso: bootloader.bin kernel.bin
+	cat $^ > bootsector.bin.tmp
+	dd if=/dev/zero of=$@ bs=512 count=2
+	dd if=bootsector.bin.tmp of=$@ conv=notrunc
 	rm bootsector.bin.tmp
 
+kernel.bin: entry.o kernel.o
+	ld -Ttext 0x1000 --oformat binary -m elf_i386 -o $@ $^
+
+bootloader.bin: bootloader.asm
+	nasm $^ -f bin -o $@
+
+entry.o: entry.asm
+	nasm $^ -f elf -o $@
+
+kernel.o: kernel.c
+	gcc -m32 -ffreestanding -c $^ -o $@
+
 clean:
-	rm bootloader.bin bootsector.bin kernel.bin kernel.o entry.o
+	rm *.bin *.o
