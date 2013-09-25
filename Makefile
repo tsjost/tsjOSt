@@ -1,12 +1,15 @@
 all: disk.iso
 
+C_SOURCES = $(wildcard src/kernel/*.c)
+C_OBJECTS = ${C_SOURCES:.c=.o}
+
 disk.iso: bootloader.bin kernel.bin
 	cat $^ > bootsector.bin.tmp
 	dd if=/dev/zero of=$@ bs=512 count=2
 	dd if=bootsector.bin.tmp of=$@ conv=notrunc
 	rm bootsector.bin.tmp
 
-kernel.bin: entry.o kernel.o
+kernel.bin: entry.o ${C_OBJECTS}
 	ld -Ttext 0x1000 --oformat binary -m elf_i386 -o $@ $^
 
 bootloader.bin: src/boot/bootloader.asm
@@ -15,8 +18,8 @@ bootloader.bin: src/boot/bootloader.asm
 entry.o: src/kernel/entry.asm
 	nasm $^ -f elf -o $@
 
-%.o: src/kernel/%.c
-	gcc -m32 -ffreestanding -Wall -Wextra -pedantic -std=c11 -c $^ -o $@
+%.o: %.c
+	gcc -m32 -ffreestanding -Iinclude -Wall -Wextra -pedantic -std=c11 -c $^ -o $@
 
 clean:
-	rm *.bin *.o
+	rm *.bin *.o src/kernel/*.o
