@@ -9,13 +9,13 @@ disk.iso: bootloader.bin kernel.bin
 kernel.bin: entry.o kernel.o
 	ld -Ttext 0x1000 --oformat binary -m elf_i386 -o $@ $^
 
-bootloader.bin: bootloader.asm
+bootloader.bin: src/boot/bootloader.asm
 	nasm $^ -f bin -o $@
 
-entry.o: entry.asm
+entry.o: src/kernel/entry.asm
 	nasm $^ -f elf -o $@
 
-kernel.o: kernel.c
+%.o: src/kernel/%.c
 	gcc -m32 -ffreestanding -Wall -Wextra -pedantic -std=c11 -c $^ -o $@
 
 clean:
