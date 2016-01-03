@@ -5,12 +5,21 @@
 void printString(char *str) {
 	static unsigned char line = 0;
 	unsigned char display_line = line % 25;
-	char *videomem = (char *) 0xb8000 + display_line*160;
+	char *videomem_start = (char *) 0xb8000;
+	char *videomem = videomem_start + display_line*160;
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
-		videomem[i*2+1] = 0x07;
-		videomem[i*2] = str[i];
+		videomem[4+ i*2+1] = 0x07;
+		videomem[4+ i*2] = str[i];
 	}
+
+	for (size_t i = 0; i < 25; ++i) {
+		videomem_start[0 + i*160] = ' ';
+		videomem_start[0 + i*160+1] = 0x00;
+	}
+	videomem[0] = '>';
+	videomem[0+1] = 0xF0;
+
 	++line;
 }
 
