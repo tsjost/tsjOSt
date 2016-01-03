@@ -5,6 +5,27 @@ EXTERN main
 EXTERN printString
 EXTERN printHex
 
+cli
+
+; Set up the PIC to send IRQs to the right offset
+mov al, 0x11
+out 0x20, al
+out 0xA0, al
+
+mov al, 0x70 ; IRQ 0-7 goes on this offset
+out 0x21, al
+mov al, 0x78 ; and IRQ 8-15 goes here
+out 0xA1, al
+
+mov al, 0x04
+out 0x21, al
+mov al, 0x02
+out 0xA1, al
+
+mov al, 0x01
+out 0x21, al
+out 0xA1, al
+
 call main
 
 push STR_GOODBYE
