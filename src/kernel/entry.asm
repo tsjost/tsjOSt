@@ -26,6 +26,10 @@ mov al, 0x01
 out 0x21, al
 out 0xA1, al
 
+; Load interrupt table!
+lidt [idt]
+sti
+
 call main
 
 push STR_GOODBYE
