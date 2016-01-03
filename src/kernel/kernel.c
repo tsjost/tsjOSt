@@ -13,8 +13,28 @@ void printString(char *str) {
 	++line;
 }
 
+void printHex(unsigned int hex) {
+	static int iters = 0;
+	char hex_str[] = "0x00000000";
+
+	for (int i = 9; i >= 2; --i) {
+		unsigned char nibble = hex & 0xF;
+		char hex_chr = '0' + nibble;
+		if (nibble > 9) {
+			hex_chr += 7;
+		}
+		hex_str[i] = hex_chr;
+		hex /= 16;
+	}
+	printString(hex_str);
+
+	++iters;
+}
+
 void main() {
 	printString("Hello World from the booted C kernel!");
 	printString("And here's another line!");
+
+	printHex(0xDEADBEEF);
 }
 
