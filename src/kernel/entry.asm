@@ -37,6 +37,26 @@ call printString
 
 jmp $
 
+handle_keyboard:
+	pushad
+	mov ebp, esp
+
+	push STR_KEYBOARD
+	call printString
+	pop eax
+
+	xor eax,eax
+	in al, 60h
+	push eax
+	call printHex
+	pop eax
+
+	mov al, 20h
+	out 20h, al
+
+	popad
+	iret
+
 exception0:
 	pushad
 	mov ebp, esp
@@ -410,7 +430,7 @@ idt_start:
 	dw 0
 
 	; 71h = IRQ1 = keyboard
-	dw irq1
+	dw handle_keyboard
 	dw 0x8
 	db 0
 	db 10001110b
@@ -506,6 +526,7 @@ idt:
 	dd idt_start
 
 STR_GOODBYE: db "Goodbye, shutting down!", 0
+STR_KEYBOARD: db "KEYBOARD!!!", 0
 STR_DOUBLEFAULT: db "DOUBLE FAULT!!!", 0
 STR_EXCEPTION: db "EXCEPTION", 0
 STR_IRQ: db "IRQ", 0
