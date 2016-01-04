@@ -18,3 +18,21 @@ void *memcpy(void * restrict dest, const void * restrict src, size_t n)
 
 	return dest;
 }
+
+void *memmove(void *dest, const void *src, size_t n)
+{
+	// Possibly undefined behaviour
+	if (src > dest) {
+		return memcpy(dest, src, n);
+	} else {
+		char *dest_c = dest;
+		const char *src_c = src;
+
+		// We can't do >= 0 because unsigned
+		for (size_t i = n; i > 0; --i) {
+			dest_c[i-1] = src_c[i-1];
+		}
+
+		return dest;
+	}
+}
