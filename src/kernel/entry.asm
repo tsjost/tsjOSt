@@ -101,6 +101,17 @@ jc .wait7
 mov al, bl
 out 60h, al
 
+; Set scan code set
+mov al, 0xF0
+out 60h, al
+mov al, 2
+out 60h, al
+
+mov al, 0xF0
+out 60h, al
+mov al, 0
+out 60h, al
+
 call main
 
 push STR_GOODBYE
