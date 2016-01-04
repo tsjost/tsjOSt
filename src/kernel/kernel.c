@@ -1,6 +1,36 @@
 #include <stddef.h>
+#include <stdbool.h>
 
 #include <string.h>
+
+static const char scancode2ascii[] = {
+	[0x1C] = 'A',
+	[0x32] = 'B',
+	[0x21] = 'C',
+	[0x23] = 'D',
+	[0x24] = 'E',
+	[0x2B] = 'F',
+	[0x34] = 'G',
+	[0x33] = 'H',
+	[0x43] = 'I',
+	[0x3B] = 'J',
+	[0x42] = 'K',
+	[0x4B] = 'L',
+	[0x3A] = 'M',
+	[0x31] = 'N',
+	[0x44] = 'O',
+	[0x4D] = 'P',
+	[0x15] = 'Q',
+	[0x2D] = 'R',
+	[0x1B] = 'S',
+	[0x2C] = 'T',
+	[0x3C] = 'U',
+	[0x2A] = 'V',
+	[0x1D] = 'W',
+	[0x22] = 'X',
+	[0x35] = 'Y',
+	[0x1A] = 'Z',
+};
 
 void printString(char *str) {
 	static unsigned char line = 0;
@@ -41,8 +71,28 @@ void printHex(unsigned int hex) {
 	++iters;
 }
 
+void handleAsciiCode(unsigned char asciicode) {
+	char str[] = "0";
+	str[0] = asciicode;
+	printString(str);
+}
 void handleScanCode(unsigned char scancode) {
-	printHex(scancode);
+	static bool is_break = false;
+	static unsigned char prev_scancode = 0;
+	if (0xF0 == scancode) {
+		is_break = true;
+		return;
+	}
+	if (0xE0 == scancode) {
+		prev_scancode = scancode;
+		return;
+	}
+
+	if ( ! is_break) {
+		handleAsciiCode(scancode2ascii[scancode]);
+	}
+	is_break = false;
+	prev_scancode = 0;
 }
 
 void main() {
