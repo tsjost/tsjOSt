@@ -30,6 +30,77 @@ out 0xA1, al
 lidt [idt]
 sti
 
+; Set up keyboard
+setupkeyboard:
+; Disable
+mov al, 0xAD
+out 64h, al
+mov al, 0xA7
+out 64h, al
+; Flush buffer
+.wait1:
+in al, 64h
+bt ax, 0
+jnc .endwait1
+in al, 60h
+jmp .wait1
+.endwait1:
+; Config byte
+mov al, 0x20
+out 64h, al
+.wait3:
+in al, 64h
+bt ax, 0
+jnc .wait3
+in al, 60h
+mov bl, al
+and bl, 00111100b
+mov al, 0x60
+out 64h, al
+.wait4:
+in al, 64h
+bt ax, 1
+jc .wait4
+mov al, bl
+out 60h, al
+; Self test
+mov al, 0xAA
+out 64h, al
+.wait5:
+in al, 64h
+bt ax, 0
+jnc .wait5
+in al, 60h
+cmp al, 0x55
+je .cont1
+push STR_PS2FAIL
+call printString
+jmp $
+.cont1:
+; Enable
+mov al, 0xAE
+out 64h, al
+mov al, 0xA8
+out 64h, al
+; Enable interrupt
+mov al, 0x20
+out 64h, al
+.wait6:
+in al, 64h
+bt ax, 0
+jnc .wait6
+in al, 60h
+mov bl, al
+or bl, 11b
+mov al, 0x60
+out 64h, al
+.wait7:
+in al, 64h
+bt ax, 1
+jc .wait7
+mov al, bl
+out 60h, al
+
 call main
 
 push STR_GOODBYE
@@ -530,3 +601,4 @@ STR_KEYBOARD: db "KEYBOARD!!!", 0
 STR_DOUBLEFAULT: db "DOUBLE FAULT!!!", 0
 STR_EXCEPTION: db "EXCEPTION", 0
 STR_IRQ: db "IRQ", 0
+STR_PS2FAIL: db "PS/2 SELF TEST FAILED!", 0
