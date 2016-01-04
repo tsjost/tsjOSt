@@ -37,6 +37,11 @@ void printString(char *str) {
 	unsigned char display_line = line % 25;
 	char *videomem_start = (char *) 0xb8000;
 	char *videomem = videomem_start + display_line*160;
+
+	if (line >= 24) {
+		memmove(videomem_start, videomem_start+160, 160*24);
+	}
+
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
 		videomem[4+ i*2+1] = 0x07;
@@ -50,7 +55,9 @@ void printString(char *str) {
 	videomem[0] = '>';
 	videomem[0+1] = 0xF0;
 
-	++line;
+	if (line < 24) {
+		++line;
+	}
 }
 
 void printHex(unsigned int hex) {
