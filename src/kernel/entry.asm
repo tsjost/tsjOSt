@@ -124,10 +124,6 @@ handle_keyboard:
 	pushad
 	mov ebp, esp
 
-	push STR_KEYBOARD
-	call printString
-	pop eax
-
 	xor eax,eax
 	in al, 60h
 	push eax
@@ -609,7 +605,6 @@ idt:
 	dd idt_start
 
 STR_GOODBYE: db "Goodbye, shutting down!", 0
-STR_KEYBOARD: db "KEYBOARD!!!", 0
 STR_DOUBLEFAULT: db "DOUBLE FAULT!!!", 0
 STR_EXCEPTION: db "EXCEPTION", 0
 STR_IRQ: db "IRQ", 0
