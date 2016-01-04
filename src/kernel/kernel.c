@@ -35,8 +35,8 @@ static const char scancode2ascii[] = {
 void printString(char *str) {
 	static unsigned char line = 0;
 	unsigned char display_line = line % 25;
-	char *videomem_start = (char *) 0xb8000;
-	char *videomem = videomem_start + display_line*160;
+	unsigned char *videomem_start = (unsigned char *) 0xb8000;
+	unsigned char *videomem = videomem_start + display_line*160;
 
 	if (line >= 24) {
 		memmove(videomem_start, videomem_start+160, 160*24);
@@ -85,13 +85,11 @@ void handleAsciiCode(unsigned char asciicode) {
 }
 void handleScanCode(unsigned char scancode) {
 	static bool is_break = false;
-	static unsigned char prev_scancode = 0;
 	if (0xF0 == scancode) {
 		is_break = true;
 		return;
 	}
 	if (0xE0 == scancode) {
-		prev_scancode = scancode;
 		return;
 	}
 
@@ -99,7 +97,6 @@ void handleScanCode(unsigned char scancode) {
 		handleAsciiCode(scancode2ascii[scancode]);
 	}
 	is_break = false;
-	prev_scancode = 0;
 }
 
 void main() {
