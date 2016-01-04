@@ -4,6 +4,7 @@ CPU 386
 EXTERN main
 EXTERN printString
 EXTERN printHex
+EXTERN handleScanCode
 
 cli
 
@@ -130,7 +131,7 @@ handle_keyboard:
 	xor eax,eax
 	in al, 60h
 	push eax
-	call printHex
+	call handleScanCode
 	pop eax
 
 	mov al, 20h

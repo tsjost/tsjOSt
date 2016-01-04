@@ -41,6 +41,10 @@ void printHex(unsigned int hex) {
 	++iters;
 }
 
+void handleScanCode(unsigned char scancode) {
+	printHex(scancode);
+}
+
 void main() {
 	printString("Hello World from the booted C kernel!");
 	printString("And here's another line!");
