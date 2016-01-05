@@ -40,6 +40,17 @@ void main()
 	}
 }
 
+struct Command *findCommand(char *command)
+{
+	for (uint8_t i = 0; i < commands_no; ++i) {
+		if (strcmp(command, commands[i].command) == 0) {
+			return &commands[i];
+		}
+	}
+
+	return NULL;
+}
+
 int kernel_getchar()
 {
 	getchar_char = GETCHAR_WAITING;

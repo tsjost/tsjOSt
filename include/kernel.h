@@ -45,6 +45,8 @@ struct Command {
 } commands[MAX_COMMANDS];
 uint8_t commands_no;
 
+struct Command *findCommand(char *command);
+
 #define GETCHAR_WAITING -1337
 #define GETCHAR_NOTWAITING -1234
 int getchar_char = GETCHAR_NOTWAITING;
