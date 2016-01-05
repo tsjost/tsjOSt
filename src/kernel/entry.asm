@@ -83,6 +83,26 @@ mov al, 0xAE
 out 64h, al
 mov al, 0xA8
 out 64h, al
+
+; Set scan code set
+mov al, 0xF0
+out 60h, al
+; Read ACK byte
+.wait8:
+in al, 64h
+bt ax, 0
+jnc .wait8
+in al, 60h ; al == 0xFA on success
+; We'd like scan code set 2
+mov al, 2
+out 60h, al
+; Read next ACK byte
+.wait9:
+in al, 64h
+bt ax, 0
+jnc .wait9
+in al, 60h ; al == 0xFA on success
+
 ; Enable interrupt
 mov al, 0x20
 out 64h, al
@@ -100,17 +120,6 @@ in al, 64h
 bt ax, 1
 jc .wait7
 mov al, bl
-out 60h, al
-
-; Set scan code set
-mov al, 0xF0
-out 60h, al
-mov al, 2
-out 60h, al
-
-mov al, 0xF0
-out 60h, al
-mov al, 0
 out 60h, al
 
 call main
