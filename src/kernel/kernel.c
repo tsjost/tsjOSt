@@ -33,6 +33,7 @@ static const char scancode2ascii[256] = {
 	[0x22] = 'X',
 	[0x35] = 'Y',
 	[0x1A] = 'Z',
+	[0x5A] = '\n',
 };
 
 struct {
