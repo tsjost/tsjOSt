@@ -76,12 +76,15 @@ void printString(char *str) {
 
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
-		printChar(str[i]);
-	}
-	cursor.x = 0;
-
-	if (cursor.y < 24) {
-		++cursor.y;
+		char chr = str[i];
+		switch (chr) {
+		case '\n':
+			++cursor.y;
+			cursor.x = 0;
+			break;
+		default:
+			printChar(chr);
+		}
 	}
 }
 
@@ -125,15 +128,16 @@ void handleScanCode(unsigned char scancode) {
 }
 
 void main() {
-	printString("Hello World from the booted C kernel!");
-	printString("And here's another line!");
+	printString("Hello World from the booted C kernel!\n");
+	printString("And here's another line!\n");
 
 	printHex(0xDEADBEEF);
+	printString("\n");
 
-	printString("Please type a character!");
+	printString("Please type a character!\n");
 	int chr = kernel_getchar();
-	printString("You typed:");
+	printString("You typed: ");
 	printChar(chr);
-	printString("");
+	printString("\n");
 }
 
