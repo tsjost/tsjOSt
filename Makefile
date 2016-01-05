@@ -3,6 +3,26 @@ all: disk.iso
 C_SOURCES = $(wildcard src/kernel/*.c)
 C_OBJECTS = ${C_SOURCES:.c=.o}
 
+CFLAGS = -m32 -ffreestanding -Iinclude -std=c11 \
+	-Wall \
+	-Wextra \
+	-pedantic \
+	-Wcast-align \
+	-Wcast-qual \
+	-Wdisabled-optimization \
+	-Wformat=2 \
+	-Winit-self \
+	-Wjump-misses-init \
+	-Wlogical-op \
+	-Wmissing-declarations \
+	-Wmissing-include-dirs \
+	-Wredundant-decls \
+	-Wshadow \
+	-Wsign-conversion \
+	-Wstrict-overflow=5 \
+	-Wswitch-default \
+	-Wundef \
+
 disk.iso: bootloader.bin kernel.bin
 	cat $^ > bootsector.bin.tmp
 	dd if=/dev/zero of=$@ bs=512 count=2
@@ -19,7 +39,7 @@ entry.o: src/kernel/entry.asm
 	nasm $^ -f elf -o $@
 
 %.o: %.c
-	gcc -m32 -ffreestanding -Iinclude -Wall -Wextra -pedantic -std=c11 -c $^ -o $@
+	gcc -c $^ -o $@ $(CFLAGS)
 
 clean:
 	rm *.bin *.o src/kernel/*.o
