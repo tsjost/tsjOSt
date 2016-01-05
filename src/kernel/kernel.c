@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <string.h>
 
@@ -51,13 +52,18 @@ int kernel_getchar()
 	return chr;
 }
 
-void printChar(char chr)
+void printCharAt(char chr, uint8_t color, uint8_t x, uint8_t y)
 {
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
+	uint16_t offset = 160*y + 2*x;
 
-	videomem_start[160*cursor.y + 2*cursor.x] = (unsigned char *) chr;
-	videomem_start[160*cursor.y + 2*cursor.x + 1] = 0x07;
+	videomem_start[offset] = (unsigned char *) chr;
+	videomem_start[offset + 1] = color;
+}
 
+void printChar(char chr)
+{
+	printCharAt(chr, 0x07, cursor.x, cursor.y);
 	++cursor.x;
 }
 
