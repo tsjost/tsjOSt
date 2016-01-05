@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-static const char scancode2ascii[] = {
+static const char scancode2ascii[256] = {
 	[0x1C] = 'A',
 	[0x32] = 'B',
 	[0x21] = 'C',
