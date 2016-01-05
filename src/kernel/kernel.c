@@ -39,6 +39,18 @@ struct {
 	unsigned char y;
 } cursor = {0, 0};
 
+int kernel_getchar()
+{
+	getchar_char = GETCHAR_WAITING;
+	while (GETCHAR_WAITING == getchar_char) {
+		__asm__("hlt");
+	}
+
+	int chr = getchar_char;
+	getchar_char = GETCHAR_NOTWAITING;
+	return chr;
+}
+
 void printChar(char chr)
 {
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
@@ -86,7 +98,9 @@ void printHex(unsigned int hex) {
 }
 
 void handleAsciiCode(char asciicode) {
-	printChar(asciicode);
+	if (GETCHAR_WAITING == getchar_char) {
+		getchar_char = asciicode;
+	}
 }
 void handleScanCode(unsigned char scancode) {
 	static bool is_break = false;
@@ -109,5 +123,11 @@ void main() {
 	printString("And here's another line!");
 
 	printHex(0xDEADBEEF);
+
+	printString("Please type a character!");
+	int chr = kernel_getchar();
+	printString("You typed:");
+	printChar(chr);
+	printString("");
 }
 
