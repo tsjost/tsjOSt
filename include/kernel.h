@@ -44,6 +44,11 @@ struct Command {
 	int (*function)();
 } commands[MAX_COMMANDS];
 uint8_t commands_no;
+#define ADD_COMMAND(cmd, desc, func) \
+	commands[commands_no].command = cmd; \
+	commands[commands_no].description = desc; \
+	commands[commands_no].function = func; \
+	++commands_no
 
 struct Command *findCommand(char *command);
 
