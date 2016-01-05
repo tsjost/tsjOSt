@@ -39,10 +39,18 @@ struct {
 	unsigned char y;
 } cursor = {0, 0};
 
-void printString(char *str) {
-	unsigned char display_line = cursor.y % 25;
+void printChar(char chr)
+{
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
-	unsigned char *videomem = videomem_start + display_line*160;
+
+	videomem_start[160*cursor.y + 2*cursor.x] = (unsigned char *) chr;
+	videomem_start[160*cursor.y + 2*cursor.x + 1] = 0x07;
+
+	++cursor.x;
+}
+
+void printString(char *str) {
+	unsigned char *videomem_start = (unsigned char *) 0xb8000;
 
 	if (cursor.y >= 24) {
 		memmove(videomem_start, videomem_start+160, 160*24);
@@ -50,9 +58,9 @@ void printString(char *str) {
 
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
-		videomem[i*2+1] = 0x07;
-		videomem[i*2] = (unsigned char) str[i];
+		printChar(str[i]);
 	}
+	cursor.x = 0;
 
 	if (cursor.y < 24) {
 		++cursor.y;
@@ -78,9 +86,7 @@ void printHex(unsigned int hex) {
 }
 
 void handleAsciiCode(char asciicode) {
-	char str[] = "0";
-	str[0] = asciicode;
-	printString(str);
+	printChar(asciicode);
 }
 void handleScanCode(unsigned char scancode) {
 	static bool is_break = false;
