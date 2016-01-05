@@ -1,3 +1,5 @@
+#include "kernel.h"
+
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -49,7 +51,7 @@ void printString(char *str) {
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
 		videomem[i*2+1] = 0x07;
-		videomem[i*2] = str[i];
+		videomem[i*2] = (unsigned char) str[i];
 	}
 
 	if (cursor.y < 24) {
@@ -75,7 +77,7 @@ void printHex(unsigned int hex) {
 	++iters;
 }
 
-void handleAsciiCode(unsigned char asciicode) {
+void handleAsciiCode(char asciicode) {
 	char str[] = "0";
 	str[0] = asciicode;
 	printString(str);
