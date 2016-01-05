@@ -63,8 +63,15 @@ void printCharAt(char chr, uint8_t color, uint8_t x, uint8_t y)
 
 void printChar(char chr)
 {
-	printCharAt(chr, 0x07, cursor.x, cursor.y);
-	++cursor.x;
+	switch (chr) {
+	case '\n':
+		++cursor.y;
+		cursor.x = 0;
+		break;
+	default:
+		printCharAt(chr, 0x07, cursor.x, cursor.y);
+		++cursor.x;
+	}
 }
 
 void printString(char *str) {
@@ -76,15 +83,7 @@ void printString(char *str) {
 
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
-		char chr = str[i];
-		switch (chr) {
-		case '\n':
-			++cursor.y;
-			cursor.x = 0;
-			break;
-		default:
-			printChar(chr);
-		}
+		printChar(str[i]);
 	}
 }
 
