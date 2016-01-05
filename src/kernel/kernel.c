@@ -34,9 +34,14 @@ void main()
 		}
 		buffer[buffer_len] = 0;
 
-		printString("You typed: ");
-		printString(buffer);
-		printString("\n");
+		struct Command *command = findCommand(buffer);
+		if (NULL != command) {
+			command->function();
+		} else {
+			printString("Unknown command \"");
+			printString(buffer);
+			printString("\"\n");
+		}
 	}
 }
 
