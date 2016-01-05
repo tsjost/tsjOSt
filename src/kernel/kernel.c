@@ -6,40 +6,39 @@
 
 #include <string.h>
 
-static const char scancode2ascii[256] = {
-	[0x1C] = 'A',
-	[0x32] = 'B',
-	[0x21] = 'C',
-	[0x23] = 'D',
-	[0x24] = 'E',
-	[0x2B] = 'F',
-	[0x34] = 'G',
-	[0x33] = 'H',
-	[0x43] = 'I',
-	[0x3B] = 'J',
-	[0x42] = 'K',
-	[0x4B] = 'L',
-	[0x3A] = 'M',
-	[0x31] = 'N',
-	[0x44] = 'O',
-	[0x4D] = 'P',
-	[0x15] = 'Q',
-	[0x2D] = 'R',
-	[0x1B] = 'S',
-	[0x2C] = 'T',
-	[0x3C] = 'U',
-	[0x2A] = 'V',
-	[0x1D] = 'W',
-	[0x22] = 'X',
-	[0x35] = 'Y',
-	[0x1A] = 'Z',
-	[0x5A] = '\n',
-};
+void main()
+{
+	printString("Hello World from the booted C kernel!\n");
+	printString("And here's another line!\n");
 
-struct {
-	unsigned char x;
-	unsigned char y;
-} cursor = {0, 0};
+	printHex(0xDEADBEEF);
+	printString("\n");
+
+	while (true) {
+		#define CMD_BUF_LEN 256
+		char buffer[CMD_BUF_LEN] = {0};
+		uint16_t buffer_len = 0;
+
+		printString("$ ");
+
+		for (uint16_t i = 0; i < CMD_BUF_LEN - 1; ++i) {
+			int chr = kernel_getchar();
+			printChar(chr);
+
+			if ('\n' == chr) {
+				break;
+			}
+
+			buffer[buffer_len] = chr;
+			++buffer_len;
+		}
+		buffer[buffer_len] = 0;
+
+		printString("You typed: ");
+		printString(buffer);
+		printString("\n");
+	}
+}
 
 int kernel_getchar()
 {
@@ -75,7 +74,8 @@ void printChar(char chr)
 	}
 }
 
-void printString(char *str) {
+void printString(char *str)
+{
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
 
 	if (cursor.y >= 24) {
@@ -88,7 +88,8 @@ void printString(char *str) {
 	}
 }
 
-void printHex(unsigned int hex) {
+void printHex(unsigned int hex)
+{
 	static int iters = 0;
 	char hex_str[] = "0x00000000";
 
@@ -106,12 +107,14 @@ void printHex(unsigned int hex) {
 	++iters;
 }
 
-void handleAsciiCode(char asciicode) {
+void handleAsciiCode(char asciicode)
+{
 	if (GETCHAR_WAITING == getchar_char) {
 		getchar_char = asciicode;
 	}
 }
-void handleScanCode(unsigned char scancode) {
+void handleScanCode(unsigned char scancode)
+{
 	static bool is_break = false;
 	if (0xF0 == scancode) {
 		is_break = true;
@@ -129,37 +132,3 @@ void handleScanCode(unsigned char scancode) {
 	}
 	is_break = false;
 }
-
-void main() {
-	printString("Hello World from the booted C kernel!\n");
-	printString("And here's another line!\n");
-
-	printHex(0xDEADBEEF);
-	printString("\n");
-
-	while (true) {
-		#define CMD_BUF_LEN 256
-		char buffer[CMD_BUF_LEN] = {0};
-		uint16_t buffer_len = 0;
-
-		printString("$ ");
-
-		for (uint16_t i = 0; i < CMD_BUF_LEN - 1; ++i) {
-			int chr = kernel_getchar();
-			printChar(chr);
-
-			if ('\n' == chr) {
-				break;
-			}
-
-			buffer[buffer_len] = chr;
-			++buffer_len;
-		}
-		buffer[buffer_len] = 0;
-
-		printString("You typed: ");
-		printString(buffer);
-		printString("\n");
-	}
-}
-
