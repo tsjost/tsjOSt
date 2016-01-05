@@ -135,10 +135,27 @@ void main() {
 	printString("\n");
 
 	while (true) {
-		printString("Please type a character!\n");
-		int chr = kernel_getchar();
+		#define CMD_BUF_LEN 256
+		char buffer[CMD_BUF_LEN] = {0};
+		uint16_t buffer_len = 0;
+
+		printString("$ ");
+
+		for (uint16_t i = 0; i < CMD_BUF_LEN - 1; ++i) {
+			int chr = kernel_getchar();
+			printChar(chr);
+
+			if ('\n' == chr) {
+				break;
+			}
+
+			buffer[buffer_len] = chr;
+			++buffer_len;
+		}
+		buffer[buffer_len] = 0;
+
 		printString("You typed: ");
-		printChar(chr);
+		printString(buffer);
 		printString("\n");
 	}
 }
