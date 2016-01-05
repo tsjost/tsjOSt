@@ -57,7 +57,7 @@ void printCharAt(char chr, uint8_t color, uint8_t x, uint8_t y)
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
 	uint16_t offset = 160*y + 2*x;
 
-	videomem_start[offset] = (unsigned char *) chr;
+	videomem_start[offset] = (unsigned char) chr;
 	videomem_start[offset + 1] = color;
 }
 
