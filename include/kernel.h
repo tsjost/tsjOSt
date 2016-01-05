@@ -37,6 +37,14 @@ struct {
 	unsigned char y;
 } cursor = {0, 0};
 
+#define MAX_COMMANDS 100
+struct Command {
+	char *command;
+	char *description;
+	int (*function)();
+} commands[MAX_COMMANDS];
+uint8_t commands_no;
+
 #define GETCHAR_WAITING -1337
 #define GETCHAR_NOTWAITING -1234
 int getchar_char = GETCHAR_NOTWAITING;
