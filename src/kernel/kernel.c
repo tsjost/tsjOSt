@@ -122,7 +122,10 @@ void handleScanCode(unsigned char scancode) {
 	}
 
 	if ( ! is_break) {
-		handleAsciiCode(scancode2ascii[scancode]);
+		char asciicode = scancode2ascii[scancode];
+		if (0 != asciicode) {
+			handleAsciiCode(asciicode);
+		}
 	}
 	is_break = false;
 }
