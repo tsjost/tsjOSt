@@ -8,6 +8,13 @@ size_t strlen(char *str)
     return len;
 }
 
+int strcmp(const char *s1, const char *s2)
+{
+	while (*s1 != 0 && *s1 == *s2)
+		++s1, ++s2;
+	return *s1 - *s2;
+}
+
 void *memcpy(void * restrict dest, const void * restrict src, size_t n)
 {
 	char * restrict dest_c = dest;
