@@ -6,8 +6,15 @@
 
 #include <string.h>
 
+void cmd_hello()
+{
+	printString("HELLO WORLD!\n");
+}
+
 void main()
 {
+	ADD_COMMAND("HELLO", "Prints greeting.", cmd_hello);
+
 	printString("Hello World from the booted C kernel!\n");
 	printString("And here's another line!\n");
 
