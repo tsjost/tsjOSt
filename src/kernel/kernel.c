@@ -134,10 +134,12 @@ void main() {
 	printHex(0xDEADBEEF);
 	printString("\n");
 
-	printString("Please type a character!\n");
-	int chr = kernel_getchar();
-	printString("You typed: ");
-	printChar(chr);
-	printString("\n");
+	while (true) {
+		printString("Please type a character!\n");
+		int chr = kernel_getchar();
+		printString("You typed: ");
+		printChar(chr);
+		printString("\n");
+	}
 }
 
