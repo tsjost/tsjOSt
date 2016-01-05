@@ -48,16 +48,9 @@ void printString(char *str) {
 
 	size_t len = strlen(str);
 	for (size_t i = 0; i < len; i++) {
-		videomem[4+ i*2+1] = 0x07;
-		videomem[4+ i*2] = str[i];
+		videomem[i*2+1] = 0x07;
+		videomem[i*2] = str[i];
 	}
-
-	for (size_t i = 0; i < 25; ++i) {
-		videomem_start[0 + i*160] = ' ';
-		videomem_start[0 + i*160+1] = 0x00;
-	}
-	videomem[0] = '>';
-	videomem[0+1] = 0xF0;
 
 	if (cursor.y < 24) {
 		++cursor.y;
