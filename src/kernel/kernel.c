@@ -32,13 +32,17 @@ static const char scancode2ascii[] = {
 	[0x1A] = 'Z',
 };
 
+struct {
+	unsigned char x;
+	unsigned char y;
+} cursor = {0, 0};
+
 void printString(char *str) {
-	static unsigned char line = 0;
-	unsigned char display_line = line % 25;
+	unsigned char display_line = cursor.y % 25;
 	unsigned char *videomem_start = (unsigned char *) 0xb8000;
 	unsigned char *videomem = videomem_start + display_line*160;
 
-	if (line >= 24) {
+	if (cursor.y >= 24) {
 		memmove(videomem_start, videomem_start+160, 160*24);
 	}
 
@@ -55,8 +59,8 @@ void printString(char *str) {
 	videomem[0] = '>';
 	videomem[0+1] = 0xF0;
 
-	if (line < 24) {
-		++line;
+	if (cursor.y < 24) {
+		++cursor.y;
 	}
 }
 
