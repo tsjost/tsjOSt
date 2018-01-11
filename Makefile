@@ -22,6 +22,8 @@ CFLAGS = -m32 -ffreestanding -Iinclude -std=c11 \
 	-Wstrict-overflow=5 \
 	-Wswitch-default \
 	-Wundef \
+	-fno-pie \
+	-fno-stack-protector
 
 disk.iso: bootloader.bin kernel.bin
 	cat $^ > bootsector.bin.tmp
