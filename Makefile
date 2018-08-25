@@ -3,7 +3,7 @@ all: disk.iso
 C_SOURCES = $(wildcard src/kernel/*.c)
 C_OBJECTS = ${C_SOURCES:.c=.o}
 
-CFLAGS = -m32 -ffreestanding -Iinclude -std=c11 \
+CFLAGS = -m32 -ffreestanding -nostdlib -Iinclude -std=c11 \
 	-Wall \
 	-Wextra \
 	-pedantic \
