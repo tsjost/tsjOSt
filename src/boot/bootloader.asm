@@ -1,12 +1,22 @@
+; ORG specifies where we expect this to be loaded into RAM.
+; 0x7c00 is the location BIOS loads things into.
 ORG 0x7c00
+; Generate 16 bit code please
 BITS 16
+; CPU instruction set is 386
 CPU 386
 
+; Define constant of the RAM location that we're gonna load the kernel into.
 KERNEL_OFFSET equ 0x1000
 
+; In the dl register, BIOS gives us the "drive number" that the current code was
+; found on, so that we can ask BIOS to load more data from the same drive later.
 mov [BOOT_DRIVE], dl
 
-; Clear screen
+;;; Clear screen
+;;; BIOS 10h interrupt (Set Video Mode)
+;;; AH = 00
+;;; AL = 02 --> 80x25 16 shades of grey text
 mov ax, 2
 int 0x10
 
@@ -37,6 +47,18 @@ load_kernel:
 disk_load:
 	push dx
 
+	;;; BIOS 13h interrupt (Disk Services)
+	;;; AH = 2 (Read disk sectors)
+	;;; AL = number of sectors to read
+	;;; CH = track/cylinder number
+	;;; CL = sector number
+	;;; DH = head number
+	;;; DL = drive number
+	;;; ES:[BX] = where to store data
+	;;; returning:
+	;;; AH = status code
+	;;; AL = number of sectors read
+	;;; CF = 0 on success, 1 on error
 	mov ah, 0x02
 	mov al, dh
 	mov ch, 0x00
