@@ -1,6 +1,6 @@
-; ORG specifies where we expect this to be loaded into RAM.
-; 0x7c00 is the location BIOS loads things into.
-ORG 0x7c00
+; BIOS looks for the magic number 0x55 0xAA at the end of the 1st sector (which is 512 bytes big) of each drive,
+; and if found, loads that sector into address 0x7c00
+ORG 0x7c00 ; Telling the assembler that we know this code will get loaded into address 0x7c00
 ; Generate 16 bit code please
 BITS 16
 ; CPU instruction set is 386
@@ -9,8 +9,9 @@ CPU 386
 ; Define constant of the RAM location that we're gonna load the kernel into.
 KERNEL_OFFSET equ 0x1000
 
-; In the dl register, BIOS gives us the "drive number" that the current code was
-; found on, so that we can ask BIOS to load more data from the same drive later.
+; The only thing guaranteed at this point is that BIOS gives us, in the DL register,
+; the "drive number" that the current code was found on,
+; so that we can ask BIOS to load more data from the same drive later.
 mov [BOOT_DRIVE], dl
 
 ;;; Clear screen
@@ -37,9 +38,10 @@ load_kernel:
 	mov si, STR_BOOTING
 	call print_string
 
-	mov bx, KERNEL_OFFSET
-	mov dh, 10
-	mov dl, [BOOT_DRIVE]
+	; Let's load the kernel stuff into RAM
+	mov bx, KERNEL_OFFSET ; Data read from drive goes into address pointed to by ES:BX
+	mov dh, 10 ; How many sectors we want to read
+	mov dl, [BOOT_DRIVE] ; Which drive to read from
 	call disk_load
 
 	ret
@@ -66,18 +68,17 @@ disk_load:
 	mov dh, 0x00
 	int 0x13
 
-	jc .error
+	jc .error ; carry flag set on error
 
 	pop dx
-	cmp dh, al
+	cmp dh, al ; AL gets number of sectors actually read
 	jne .error_sectors_not_same
 	ret
 
 	.error:
 	mov si, STR_DISK_ERROR
 	call print_string
-	mov dx, ax
-	mov si, dx
+	mov si, ax ; AH contains the status code
 	call print_hex
 	jmp $
 
