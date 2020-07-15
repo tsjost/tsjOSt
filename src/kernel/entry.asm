@@ -1,6 +1,8 @@
 BITS 32
 CPU 386
 
+VIDEOMEM equ 0xb8000
+
 EXTERN main
 EXTERN printString
 EXTERN printHex
@@ -128,6 +130,43 @@ push STR_GOODBYE
 call printString
 
 jmp $
+
+print_char_at:
+	; Character in DI, x pos in EAX, y pos in EBX
+
+	; = 2 * (80*y + x)
+	imul ebx, ebx, 80
+	add ebx, eax
+	add ebx, ebx
+
+	mov edx, ebx
+	inc edx
+	mov [VIDEOMEM + ebx], di
+	mov [VIDEOMEM + edx], byte 0x07
+
+	ret
+
+print_char:
+	; Character in DI
+	movzx ax, byte [CURSOR]
+	movzx bx, byte [CURSOR+1]
+	call print_char_at
+	inc ax
+	mov byte [CURSOR], al
+	ret
+
+print_string:
+	; String in SI
+	.loop:
+	cmp [si], byte 0
+	je .end
+	mov di, [si]
+	call print_char
+	inc si
+	jmp .loop
+
+	.end:
+	ret
 
 handle_keyboard:
 	pushad
@@ -613,6 +652,7 @@ idt:
 	dw idt_end - idt_start
 	dd idt_start
 
+CURSOR: dw 0
 STR_GOODBYE: db "Goodbye, shutting down!", 0
 STR_DOUBLEFAULT: db "DOUBLE FAULT!!!", 0
 STR_EXCEPTION: db "EXCEPTION", 0
